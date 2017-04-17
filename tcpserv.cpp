@@ -14,11 +14,7 @@ void sig_child(int signal)
 void processFile(int connfd)
 {
     char buf[MAXLINE], *filename;
-    char path[] = "~/";
-    // cout << "1" << endl;
-    // if (Readline(connfd, buf, sizeof(buf)) == 0) {
-    //     err_quit("processFile: server terminated");
-    // }
+
     ssize_t n;
     if ((n = Read(connfd, buf, sizeof(buf))) < 0) {
         err_sys("read error");
@@ -31,15 +27,20 @@ void processFile(int connfd)
     strcat(filename, buf);
     cout << filename << endl;
 
-    // int filefd;
-    // if ((filefd = open(filename, O_WRONLY | O_CREAT, 0664)) == -1) {
-    //     err_sys("open %s error", filename);
-    // } else {
-    //     strcpy(buf, "success\n");
-    //     Writen(connfd, buf, strlen(buf));
-    // }
-    strcpy(buf, "success\n");
-    Writen(connfd, buf, strlen(buf));
+    int filefd;
+    // open file and create it with 0664 if not exist
+    if ((filefd = open(filename, O_WRONLY | O_CREAT, S_IWUSR | S_IRUSR | S_IWGRP | S_IROTH)) == -1) {
+        err_sys("open %s error", filename);
+    } else {
+        strcpy(buf, "success\n");
+        Writen(connfd, buf, strlen(buf));
+    }
+
+    while (Readline(connfd, buf, sizeof(buf)) != 0) {
+        Writen(filefd, buf, strlen(buf));
+    }
+
+    Close(filefd);
 }
 
 int main(int argc, char *argv[]) {

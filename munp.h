@@ -22,6 +22,8 @@ const int BUFFSIZE = 8192;	/* buffer size for reads and writes */
 
 const int SERV_PORT = 9987;
 
+const char path[] = "/home/marrow/";     /* file path */
+
 ssize_t writen(int, const void *, size_t);
 void Writen(int, void *, size_t);
 
