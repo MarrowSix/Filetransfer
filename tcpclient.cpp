@@ -2,7 +2,7 @@
 #include <iostream>
 using namespace std;
 
-int main(int argc, char const *argv[]) {
+int main(int argc, char *argv[]) {
     int clientfd;
     sockaddr_in servaddr;
     char recvline[MAXLINE];
@@ -10,6 +10,8 @@ int main(int argc, char const *argv[]) {
     if (argc != 3) {
         cout << "usage: <IPAddress> <Filename>" << endl;
     }
+
+    
 
     if ((clientfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         err_sys("socket errno");
@@ -26,8 +28,13 @@ int main(int argc, char const *argv[]) {
         err_sys("connect error");
     }
 
-    string filename(argv[2]);
-    Writen(clientfd, const_cast<char *>(filename.c_str()), filename.size());
+    // string filename(argv[2]);
+    // char *filename = new char[strlen(argv[2]) + 1];
+    // filename[strlen(argv[2])] = '\n';
+    // filename[strlen(argv[2])+1] = '\0';
+
+    Writen(clientfd, argv[2], strlen(argv[2]));
+    cout << "write success" << endl;
     Readline(clientfd, recvline, sizeof(recvline));
 
     if (strcmp(recvline, "success\n")) {

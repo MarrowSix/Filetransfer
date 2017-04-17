@@ -14,7 +14,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#define SA struct sockaddr
+#define	SA	struct sockaddr
 #define	LISTENQ		1024   /* 2nd argument to listen() */
 
 const int MAXLINE = 4096;	/* max text line length */
@@ -28,6 +28,14 @@ void Writen(int, void *, size_t);
 ssize_t Readline(int, void *, size_t);
 
 void Close(int fd);
+void Bind(int fd, const struct sockaddr *sa, socklen_t salen);
+void Connect(int fd, const struct sockaddr *sa, socklen_t salen);
+int Socket(int family, int type, int protocol);
+void Listen(int fd, int backlog);
+
+ssize_t Read(int fd, void *ptr, size_t nbytes);
+ssize_t	readn(int fd, void *vptr, size_t n);
+ssize_t Readn(int fd, void *ptr, size_t nbytes);
 
 void	 err_dump(const char *, ...);
 void	 err_msg(const char *, ...);

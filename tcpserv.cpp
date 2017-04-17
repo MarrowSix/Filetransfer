@@ -1,4 +1,6 @@
 #include "munp.h"
+#include <iostream>
+using namespace std;
 
 void sig_child(int signal)
 {
@@ -12,42 +14,48 @@ void sig_child(int signal)
 void processFile(int connfd)
 {
     char buf[MAXLINE], *filename;
-    char path[] = "/home/pi/Documents/temp/";
-    Readline(connfd, buf, MAXLINE);
-    filename = new char[strlen(buf)+strlen(path)];
+    char path[] = "~/";
+    // cout << "1" << endl;
+    // if (Readline(connfd, buf, sizeof(buf)) == 0) {
+    //     err_quit("processFile: server terminated");
+    // }
+    ssize_t n;
+    if ((n = Read(connfd, buf, sizeof(buf))) < 0) {
+        err_sys("read error");
+    }
+    // buf[strlen(buf)-1] = '\0';
+    cout << buf << endl;
+    filename = new char[strlen(buf)+strlen(path)+1];
 
     strcat(filename, path);
     strcat(filename, buf);
+    cout << filename << endl;
 
-    int filefd;
-    if ((filefd = open(filename, O_WRONLY | O_CREAT)) == -1) {
-        err_sys("open %s error", filename);
-    } else {
-        strcpy(buf, "success\n");
-        Writen(connfd, buf, strlen(buf));
-    }
+    // int filefd;
+    // if ((filefd = open(filename, O_WRONLY | O_CREAT, 0664)) == -1) {
+    //     err_sys("open %s error", filename);
+    // } else {
+    //     strcpy(buf, "success\n");
+    //     Writen(connfd, buf, strlen(buf));
+    // }
+    strcpy(buf, "success\n");
+    Writen(connfd, buf, strlen(buf));
 }
 
-int main(int argc, char const *argv[]) {
+int main(int argc, char *argv[]) {
     int listenfd, connfd;
     struct sockaddr_in servaddr;
 
-    if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        err_sys("socket error");
-    }
+    listenfd = Socket(AF_INET, SOCK_STREAM, 0);
 
     bzero(&servaddr, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
     servaddr.sin_port = htons(SERV_PORT);
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-    if (bind(listenfd, (SA *) &servaddr, sizeof(servaddr))) {
-        err_sys("bind error");
-    }
+    Bind(listenfd, (SA *) &servaddr, sizeof(servaddr));
+    Listen(listenfd, LISTENQ);
 
-    if (listen(listenfd, LISTENQ)) {
-        err_sys("listen error");
-    }
     signal(SIGCHLD, sig_child);
 
     while (1) {
@@ -62,6 +70,7 @@ int main(int argc, char const *argv[]) {
         pid_t pid;
         if ((pid = fork()) == 0) {
             Close(listenfd);
+            cout << "fork" << endl;
             processFile(connfd);
             Close(connfd);
             exit(0);
