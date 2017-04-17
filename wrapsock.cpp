@@ -1,0 +1,7 @@
+#include "munp.h"
+
+void Close(int fd)
+{
+	if (close(fd) == -1)
+		err_sys("close error");
+}

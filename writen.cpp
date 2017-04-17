@@ -22,7 +22,7 @@ ssize_t writen(int fd, const void *vptr, size_t n)
     return (n);
 }
 
-void Wirten(int fd, void *ptr, size_t nbytes)
+void Writen(int fd, void *ptr, size_t nbytes)
 {
     if (writen(fd, ptr, nbytes) != nbytes) {
         err_sys("writen errno");

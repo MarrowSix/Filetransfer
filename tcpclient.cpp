@@ -1,12 +1,11 @@
-#include "unp.h"
+#include "munp.h"
 #include <iostream>
 using namespace std;
-
-const short port = 9987;
 
 int main(int argc, char const *argv[]) {
     int clientfd;
     sockaddr_in servaddr;
+    char recvline[MAXLINE];
 
     if (argc != 3) {
         cout << "usage: <IPAddress> <Filename>" << endl;
@@ -18,7 +17,7 @@ int main(int argc, char const *argv[]) {
 
     bzero(&servaddr, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
-    servaddr.sin_port = htons(port);
+    servaddr.sin_port = htons(SERV_PORT);
     if (inet_pton(AF_INET, argv[1], &servaddr.sin_addr) == 0) {
         err_sys("inet_pton error");
     }
@@ -29,6 +28,12 @@ int main(int argc, char const *argv[]) {
 
     string filename(argv[2]);
     Writen(clientfd, const_cast<char *>(filename.c_str()), filename.size());
+    Readline(clientfd, recvline, sizeof(recvline));
+
+    if (strcmp(recvline, "success\n")) {
+        err_quit("recvline not equal to success\n");
+    }
+
 
 
     return 0;
