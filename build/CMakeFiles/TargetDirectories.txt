@@ -1,0 +1,4 @@
+/home/marrow/Workspace/C++/Filetransfer/build/CMakeFiles/rebuild_cache.dir
+/home/marrow/Workspace/C++/Filetransfer/build/CMakeFiles/server.dir
+/home/marrow/Workspace/C++/Filetransfer/build/CMakeFiles/edit_cache.dir
+/home/marrow/Workspace/C++/Filetransfer/build/CMakeFiles/client.dir
