@@ -1,5 +1,7 @@
 #include "munp.h"
 
+#include <string>
+
 ssize_t writen(int fd, const void *vptr, size_t n)
 {
     size_t nleft;
@@ -27,4 +29,13 @@ void Writen(int fd, void *ptr, size_t nbytes)
     if (writen(fd, ptr, nbytes) != nbytes) {
         err_sys("writen errno");
     }
+}
+
+ssize_t bwriten(int fd, const int16_t& bdata, size_t n)
+{
+    std::string data = std::to_string(bdata);
+    if (writen(fd, data.c_str(), data.size())) {
+        return 0;
+    }
+    return n;
 }

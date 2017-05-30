@@ -2,3 +2,5 @@
 *.gch
 tcpclient
 tcpserv
+build/
+*.user

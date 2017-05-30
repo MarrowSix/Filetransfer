@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
     char recvline[MAXLINE], sendline[MAXLINE];
 
     if (argc != 3) {
-        cout << "usage: <IPAddress> <Filename>" << endl;
+        printf("usage: <IPAddress> <Filename>\n");
     }
 
     if ((clientfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -35,7 +35,8 @@ int main(int argc, char *argv[]) {
     filename = strrchr(argv[2], '/') + 1;
 
     Writen(clientfd, filename, strlen(filename));
-    cout << "write success" << endl;
+//     cout << "write success" << endl;
+    printf("write file %s success\n", filename);
     Readline(clientfd, recvline, sizeof(recvline));
 
     if (strcmp(recvline, "success\n")) {

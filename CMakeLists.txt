@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.1)
 
 set(CLI_NAME client)
 set(SRV_NAME server)
-
-project ($CLI_NAME)
+set(REC_NAME cycle)
+# project ($CLI_NAME)
 
 set(CODEROOT ${CMAKE_SOURCE_DIR}/sources)
 
@@ -30,13 +30,15 @@ set(MODEL_SRC
 )
 
 set(MODEL_SRV_SRC
-  ${MODEL_SRC}
   ./tcpserv.cpp
 )
 
 set(MODEL_CLI_SRC
-  ${MODEL_SRC}
   ./tcpclient.cpp
+)
+
+set(MODEL_CLI_REC
+  ./cycle.cc
 )
 
 set(MODEL_HEADERS
@@ -44,6 +46,6 @@ set(MODEL_HEADERS
 )
 
 # add the executable
-add_executable(${CLI_NAME} ${MODEL_SRV_SRC} ${MODEL_HEADERS})
-add_executable(${SRV_NAME} ${MODEL_CLI_SRC} ${MODEL_HEADERS})
-
+add_executable(${SRV_NAME} ${MODEL_SRV_SRC} ${MODEL_SRC} ${MODEL_HEADERS})
+add_executable(${CLI_NAME} ${MODEL_CLI_SRC} ${MODEL_SRC} ${MODEL_HEADERS})
+add_executable(${REC_NAME} ${MODEL_CLI_REC} ${MODEL_SRC} ${MODEL_HEADERS})

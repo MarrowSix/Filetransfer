@@ -22,10 +22,11 @@ const int BUFFSIZE = 8192;	/* buffer size for reads and writes */
 
 const int SERV_PORT = 9987;
 
-const char path[] = "/home/marrow/";     /* file path */
+const char path[] = "./";     /* file path */
 
 ssize_t writen(int, const void *, size_t);
 void Writen(int, void *, size_t);
+ssize_t bwriten(int fd, const int16_t& bdata, size_t n);
 
 ssize_t Readline(int, void *, size_t);
 

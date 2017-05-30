@@ -2,6 +2,10 @@
 #include <iostream>
 using namespace std;
 
+const int16_t FNEXIST = 0x0001;
+const int16_t PFLAG = 0x0010;
+const int16_t ACK = 0x0100;
+
 void sig_child(int signal)
 {
     pid_t pid;
@@ -20,12 +24,12 @@ void processFile(int connfd)
         err_sys("read error");
     }
     // buf[strlen(buf)-1] = '\0';
-    cout << buf << endl;
+    printf("buf: %s\n", buf);
     filename = new char[strlen(buf)+strlen(path)+1];
 
     strcat(filename, path);
     strcat(filename, buf);
-    cout << filename << endl;
+    printf("filename: %s\n", filename);
 
     int filefd;
     // open file and create it with 0664 if not exist
@@ -41,6 +45,25 @@ void processFile(int connfd)
     }
 
     Close(filefd);
+}
+
+void proformCheck(int connfd)
+{
+    int16_t data = htons(PFLAG);
+    Writen(connfd, &data, sizeof(data));
+    
+    std::string name("model\n");
+    while (1) {
+        Writen(connfd, const_cast<char *>(name.c_str()), name.size());
+        
+        int16_t ack = 0;
+        Readn(connfd, &ack, sizeof(ack));
+        ack = ntohs(ack);
+        
+        if (ack != ACK) {
+            break;
+        }
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -71,8 +94,15 @@ int main(int argc, char *argv[]) {
         pid_t pid;
         if ((pid = fork()) == 0) {
             Close(listenfd);
-            cout << "fork" << endl;
-            processFile(connfd);
+            int16_t srvFlag = 0;
+            Readn(connfd, &srvFlag, sizeof(srvFlag));
+            srvFlag = ntohs(srvFlag);
+            if (srvFlag == PFLAG) {
+                proformCheck(connfd);
+            } else {
+                processFile(connfd);
+            }
+
             Close(connfd);
             exit(0);
         }
