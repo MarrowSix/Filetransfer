@@ -3,19 +3,17 @@
 #include <algorithm>
 #include <assert.h>
 
-const int16_t FNEXIST = 0x0001;
-const int16_t PFLAG = 0x0010;
-const int16_t ACK = 0x0100;
+
 const size_t SLEEP = 10;
 
 int main(int argc, char* argv[])
 {
     int clientfd;
     sockaddr_in servaddr;
-    char recvline[MAXLINE], sendline[MAXLINE];
 
     if (argc != 2) {
         printf("usage: <IPAddress>\n");
+        exit(1);
     }
     
     if ((clientfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -41,6 +39,7 @@ int main(int argc, char* argv[])
         
         int16_t rflag = 0;
         Readn(clientfd, &rflag, sizeof(rflag));
+        rflag = ntohs(rflag);
         
         if (rflag == flag) {
             printf("success\n");

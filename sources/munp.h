@@ -20,6 +20,11 @@
 const int MAXLINE = 4096;	/* max text line length */
 const int BUFFSIZE = 8192;	/* buffer size for reads and writes */
 
+const int16_t FNEXIST = 0x0001;
+const int16_t PFLAG = 0x0010;
+const int16_t ACK = 0x0100;
+const int16_t FFLAG = 0x1000;
+
 const int SERV_PORT = 9987;
 
 const char path[] = "./";     /* file path */

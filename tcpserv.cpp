@@ -2,10 +2,6 @@
 #include <iostream>
 using namespace std;
 
-const int16_t FNEXIST = 0x0001;
-const int16_t PFLAG = 0x0010;
-const int16_t ACK = 0x0100;
-
 void sig_child(int signal)
 {
     pid_t pid;
@@ -17,6 +13,9 @@ void sig_child(int signal)
 
 void processFile(int connfd)
 {
+    int16_t data = htons(FFLAG);
+    Writen(connfd, &data, sizeof(data));
+    
     char buf[MAXLINE], *filename;
 
     ssize_t n;
@@ -99,7 +98,7 @@ int main(int argc, char *argv[]) {
             srvFlag = ntohs(srvFlag);
             if (srvFlag == PFLAG) {
                 proformCheck(connfd);
-            } else {
+            } else if (srvFlag == FFLAG) {
                 processFile(connfd);
             }
 

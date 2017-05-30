@@ -1,5 +1,6 @@
 #include "sources/munp.h"
 #include <iostream>
+#include <assert.h>
 using namespace std;
 
 int main(int argc, char *argv[]) {
@@ -9,6 +10,7 @@ int main(int argc, char *argv[]) {
 
     if (argc != 3) {
         printf("usage: <IPAddress> <Filename>\n");
+        exit(1);
     }
 
     if ((clientfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -26,6 +28,14 @@ int main(int argc, char *argv[]) {
         err_sys("connect error");
     }
 
+    int16_t flag = htons(FFLAG);
+    Writen(clientfd, &flag, sizeof(flag));
+    
+    Readn(clientfd, &flag, sizeof(flag));
+    flag = ntohs(flag);
+    
+    assert(flag == FFLAG);
+    
     char *filename = argv[2];
 
     if (access(filename, F_OK | R_OK | W_OK) < 0) {
@@ -35,7 +45,6 @@ int main(int argc, char *argv[]) {
     filename = strrchr(argv[2], '/') + 1;
 
     Writen(clientfd, filename, strlen(filename));
-//     cout << "write success" << endl;
     printf("write file %s success\n", filename);
     Readline(clientfd, recvline, sizeof(recvline));
 
@@ -52,6 +61,7 @@ int main(int argc, char *argv[]) {
     while ((n = Readline(filefd, sendline, sizeof(recvline))) != 0) {
         Writen(clientfd, sendline, strlen(sendline));
     }
+    printf("success\n");
     Close(filefd);
 
     return 0;
