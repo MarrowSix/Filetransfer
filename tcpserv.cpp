@@ -46,23 +46,52 @@ void processFile(int connfd)
     Close(filefd);
 }
 
+bool checkFile(std::string name)
+{
+    if (access(name.c_str(), F_OK | R_OK | W_OK) < 0) {
+        printf("file %s is no exist", name.c_str());
+        return true;
+    }
+    return false;
+}
+
 void proformCheck(int connfd)
 {
-    int16_t data = htons(PFLAG);
-    Writen(connfd, &data, sizeof(data));
+    char buf[MAXLINE];
+    char recvline[MAXLINE], sendline[MAXLINE];
+    string name;
+    int i = 0;
     
-    std::string name("model\n");
-    while (1) {
-        Writen(connfd, const_cast<char *>(name.c_str()), name.size());
-        
-        int16_t ack = 0;
-        Readn(connfd, &ack, sizeof(ack));
-        ack = ntohs(ack);
-        
-        if (ack != ACK) {
-            break;
-        }
+    Readline(connfd, buf, sizeof(buf));
+    
+    while (buf[i] != '\n') {
+        name += buf[i];
+        i++;
     }
+    printf("%s\n", name.c_str());
+    
+    if (checkFile(name)) {
+        int16_t fnflag = htons(FNEXIST);
+        Writen(connfd, &fnflag, sizeof(fnflag));
+        return;
+    } else {
+        int16_t fnflag = htons(PFLAG);
+        Writen(connfd, &fnflag, sizeof(fnflag));
+        printf("data file exist\n");
+    }
+    // file transfer
+    int filefd, n;
+    // open file with readonly
+    if ((filefd = open(name.c_str(), O_RDONLY)) < 0) {
+        err_sys("open file %s failure", name.c_str());
+    }
+
+    while ((n = Readline(filefd, sendline, sizeof(recvline))) != 0) {
+        Writen(connfd, sendline, strlen(sendline));
+    }
+    printf("transfer finished\n");
+    
+    Close(filefd);
 }
 
 int main(int argc, char *argv[]) {
@@ -97,6 +126,8 @@ int main(int argc, char *argv[]) {
             Readn(connfd, &srvFlag, sizeof(srvFlag));
             srvFlag = ntohs(srvFlag);
             if (srvFlag == PFLAG) {
+                int16_t data = htons(PFLAG);
+                Writen(connfd, &data, sizeof(data));
                 proformCheck(connfd);
             } else if (srvFlag == FFLAG) {
                 processFile(connfd);

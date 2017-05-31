@@ -24,6 +24,7 @@ const int16_t FNEXIST = 0x0001;
 const int16_t PFLAG = 0x0010;
 const int16_t ACK = 0x0100;
 const int16_t FFLAG = 0x1000;
+const int16_t CLFLAG = 0x0011;
 
 const int SERV_PORT = 9987;
 

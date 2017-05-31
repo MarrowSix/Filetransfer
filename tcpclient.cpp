@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
         err_quit("file %s is no exist", filename);
     }
 
-    filename = strrchr(argv[2], '/') + 1;
+    filename = strrchr(argv[2], '/') == NULL ? argv[2] : strrchr(argv[2], '/') + 1;
 
     Writen(clientfd, filename, strlen(filename));
     printf("write file %s success\n", filename);

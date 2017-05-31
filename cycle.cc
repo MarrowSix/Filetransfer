@@ -3,19 +3,57 @@
 #include <algorithm>
 #include <assert.h>
 
-
 const size_t SLEEP = 10;
+bool cflag = false;
+
+void checkFile(int connfd, std::string name)
+{
+    name += '\n';
+    Writen(connfd, const_cast<char *>(name.c_str()), name.size());
+    
+    int16_t fack = 0;
+    Readn(connfd, &fack, sizeof(fack));
+    fack = ntohs(fack);
+    
+    if (fack == FNEXIST) {
+        printf("data file %s not exist\n", name.c_str());
+        exit(1);
+    }
+}
+
+void proformMessage(int connfd, std::string &name)
+{
+    char buf[MAXLINE];
+//     if (!cflag) {
+        checkFile(connfd, name);
+//         cflag = true;
+//     }
+    int filefd;
+    // open file and create it with 0664 if not exist
+    if ((filefd = open(name.c_str(), O_WRONLY | O_CREAT, S_IWUSR | S_IRUSR | S_IWGRP | S_IROTH)) == -1) {
+        err_sys("open %s error", name.c_str());
+    }
+            
+    while (Readline(connfd, buf, sizeof(buf)) != 0) {
+        Writen(filefd, buf, strlen(buf));
+    }
+    
+    Close(filefd);
+   
+}
+
 
 int main(int argc, char* argv[])
 {
     int clientfd;
     sockaddr_in servaddr;
 
-    if (argc != 2) {
-        printf("usage: <IPAddress>\n");
+    if (argc != 3) {
+        printf("usage: <IPAddress> <Filename>\n");
         exit(1);
     }
-    
+
+again:
     if ((clientfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         err_sys("socket errno");
     }
@@ -27,32 +65,38 @@ int main(int argc, char* argv[])
         err_sys("inet_pton error");
     }
 
-    if (connect(clientfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) < 0) {
-        err_sys("connect error");
-    }
-
-    std::string filename {argv[1]};
+    std::string filename {argv[2]};
     
-    while (1) {
+//     while (1) {
+        if (connect(clientfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) < 0) {
+            printf("connect error\n");
+            exit(1);
+        }
+        
+//         printf("%d ", PFLAG);
         int16_t flag = htons(PFLAG);
         Writen(clientfd, &flag, sizeof(flag));
         
         int16_t rflag = 0;
         Readn(clientfd, &rflag, sizeof(rflag));
         rflag = ntohs(rflag);
+//         printf("%d \n", rflag);
         
-        if (rflag == flag) {
-            printf("success\n");
-            char buf[MAXLINE];
-            while(Readline(clientfd, buf, sizeof(buf))) {
-                printf("filename: %s", buf);
-                
-                int16_t ack = htons(ACK);
-                Writen(clientfd, &ack, sizeof(ack));
-            }
+        if (rflag == PFLAG) {
+            printf("success connected to %s\n", argv[1]);
+            printf("receiving file %s\n", argv[1]);
+            proformMessage(clientfd, filename);
+            printf("received file %s\n", argv[1]);
         }
         
-    }
+        Close(clientfd);
+        
+        unsigned long s = SLEEP;
+        while ((s = sleep(s)))
+            ;
+    
+        goto again;
+//     }
 
     return 0;
 }
