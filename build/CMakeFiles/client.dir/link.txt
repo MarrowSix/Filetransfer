@@ -1,1 +1,0 @@
-/usr/bin/c++    -std=c++11   CMakeFiles/client.dir/sources/error.cpp.o CMakeFiles/client.dir/sources/readline.cpp.o CMakeFiles/client.dir/sources/readn.cpp.o CMakeFiles/client.dir/sources/wraplinux.cpp.o CMakeFiles/client.dir/sources/wrapsock.cpp.o CMakeFiles/client.dir/sources/writen.cpp.o CMakeFiles/client.dir/tcpserv.cpp.o  -o client -rdynamic 
