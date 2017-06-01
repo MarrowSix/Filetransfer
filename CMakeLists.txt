@@ -6,18 +6,20 @@ set(REC_NAME cycle)
 # project ($CLI_NAME)
 
 set(CODEROOT ${CMAKE_SOURCE_DIR}/sources)
+set(INPATH ${CMAKE_SOURCE_DIR}/include)
 
+# build flag
 set(CMAKE_C_FLAGS_DEBUG "-g -Wall")
 set(CMAKE_CXX_FLAGS_RELEASE ${CMAKE_C_FLAGS_DEBUG})
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std99")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FALGS} -std=c++11")
 if(CLANG)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 endif()
 
 set(PLATFORM_SPECIFIC_SRC
-  ./tcpclient.cpp
-  ./tcpserv.cpp
+  ./tcpclient.cc
+  ./tcpserv.cc
 )
 
 set(MODEL_SRC
@@ -30,11 +32,11 @@ set(MODEL_SRC
 )
 
 set(MODEL_SRV_SRC
-  ./tcpserv.cpp
+  ./tcpserv.cc
 )
 
 set(MODEL_CLI_SRC
-  ./tcpclient.cpp
+  ./tcpclient.cc
 )
 
 set(MODEL_CLI_REC
@@ -45,7 +47,11 @@ set(MODEL_HEADERS
   sources/munp.h
 )
 
+# add include path
+include_directories(${CMAKE_SOURCE_DIR}/include)
+
 # add the executable
 add_executable(${SRV_NAME} ${MODEL_SRV_SRC} ${MODEL_SRC} ${MODEL_HEADERS})
 add_executable(${CLI_NAME} ${MODEL_CLI_SRC} ${MODEL_SRC} ${MODEL_HEADERS})
 add_executable(${REC_NAME} ${MODEL_CLI_REC} ${MODEL_SRC} ${MODEL_HEADERS})
+add_executable(tt test.cc ${INPATH}/bcm/bcm2835.h ${INPATH}/bcm/bcm2835.c)
